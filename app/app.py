@@ -80,11 +80,16 @@ def section_header(text: str) -> rx.Component:
     )
 
 
-def card(image: str, title: str) -> rx.Component:
+def card(image: str, title: str, href: str = None) -> rx.Component:
     return rx.el.div(
         rx.el.img(src=image, class_name="w-full h-40 object-cover rounded-t-lg"),
         rx.el.div(rx.el.p(title, class_name="text-lg font-bold"), class_name="p-4"),
-        class_name="bg-gray-800 rounded-lg overflow-hidden border border-gray-700",
+        class_name=rx.cond(
+            href,
+            "bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:opacity-80 transition-opacity cursor-pointer",
+            "bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:opacity-80 transition-opacity"
+        ),
+        on_click=rx.cond(href, rx.redirect(href), None),
     )
 
 
@@ -101,19 +106,75 @@ def courses_section() -> rx.Component:
     )
 
 
+def reel_card(image: str, title: str, href: str) -> rx.Component:
+    return rx.el.a(
+        rx.el.div(
+            rx.el.div(
+                rx.el.img(
+                    src=image,
+                    class_name="w-full h-full object-cover",
+                ),
+                rx.el.div(
+                    rx.el.div(
+                        rx.icon("instagram", class_name="text-white w-8 h-8"),
+                        class_name="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-2 rounded-xl",
+                    ),
+                    class_name="absolute inset-0 flex items-center justify-center opacity-80",
+                ),
+                class_name="relative w-full h-full overflow-hidden",
+            ),
+            rx.el.div(
+                rx.el.p(title, class_name="text-cyan-400 text-sm font-semibold text-center"),
+                class_name="p-2",
+            ),
+            class_name="w-80 h-48 rounded-lg border-2 border-cyan-400 shadow-lg overflow-hidden bg-gray-800 hover:opacity-90 transition-opacity",
+        ),
+        href=href,
+        target="_blank",
+        class_name="block",
+    )
+
+
 def speaking_section() -> rx.Component:
     return rx.el.div(
         section_header("SPEAKER"),
         rx.el.div(
-            rx.foreach(
-                State.speaking_engagements,
-                lambda s: rx.el.div(
-                    rx.el.p(s["event"], class_name="font-bold"),
-                    rx.el.p(s["topic"]),
-                    class_name="bg-gray-800 p-4 rounded-lg border border-gray-700",
+            rx.el.div(
+                rx.el.iframe(
+                    src="https://www.youtube.com/embed/kVNA1hBPj-E?themeRefresh=1",
+                    class_name="w-80 h-48 rounded-lg border-2 border-cyan-400 shadow-lg",
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                    allowfullscreen=True,
                 ),
+                class_name="flex justify-center",
             ),
-            class_name="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto",
+            rx.el.div(
+                rx.el.iframe(
+                    src="https://www.youtube.com/embed/EIT88uIYkYI",
+                    class_name="w-80 h-48 rounded-lg border-2 border-cyan-400 shadow-lg",
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                    allowfullscreen=True,
+                ),
+                class_name="flex justify-center",
+            ),
+            rx.el.div(
+                rx.el.iframe(
+                    src="https://www.youtube.com/embed/21Pb8Uy1upM",
+                    class_name="w-80 h-48 rounded-lg border-2 border-cyan-400 shadow-lg",
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                    allowfullscreen=True,
+                ),
+                class_name="flex justify-center",
+            ),
+            rx.el.div(
+                reel_card(
+                    image="/startup-grind-reel.jpg",
+                    title="Startup Grind Bogotá · Instagram Reel",
+                    href="https://www.instagram.com/startupgrindbogota/reel/DQ7BT3hEfzl/",
+                ),
+                class_name="flex justify-center",
+            ),
+            class_name="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto",
         ),
         id="speaker",
         on_mount=lambda: State.set_active_nav("Speaker"),
@@ -121,12 +182,62 @@ def speaking_section() -> rx.Component:
     )
 
 
+def blog_card(image: str, title: str, description: str, href: str) -> rx.Component:
+    return rx.el.a(
+        rx.el.div(
+            rx.el.img(
+                src=image,
+                class_name="w-full h-48 object-cover",
+            ),
+            rx.el.div(
+                rx.el.p(
+                    title,
+                    class_name="text-cyan-400 text-lg font-bold mb-2",
+                ),
+                rx.el.p(
+                    description,
+                    class_name="text-gray-300 text-sm leading-relaxed",
+                ),
+                rx.el.p(
+                    "Leer más →",
+                    class_name="text-cyan-400 text-sm font-semibold mt-4 hover:text-white transition-colors",
+                ),
+                class_name="p-4",
+            ),
+            class_name="bg-gray-800 rounded-lg overflow-hidden border border-cyan-400 shadow-lg hover:opacity-90 transition-opacity",
+        ),
+        href=href,
+        target="_blank",
+        class_name="block w-80",
+    )
+
+
 def blog_section() -> rx.Component:
     return rx.el.div(
         section_header("BLOG"),
         rx.el.div(
-            rx.foreach(State.blog_posts, lambda p: card(p["image"], p["title"])),
-            class_name="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto",
+            rx.el.div(
+                rx.el.iframe(
+                    src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7392616151253639168",
+                    height="570",
+                    width="504",
+                    frameborder="0",
+                    allowfullscreen="",
+                    title="Embedded post",
+                    class_name="rounded-lg border-2 border-cyan-400 shadow-lg",
+                ),
+                class_name="flex justify-center",
+            ),
+            rx.el.div(
+                blog_card(
+                    image="https://blockvoz.xyz/wp-content/uploads/2026/03/sebas-melo-ia--1320x880.png",
+                    title="El cerebro y la inteligencia artificial",
+                    description="¿Qué cambios presenta el cerebro ante la IA? La IA no reemplaza nuestra mente, la reta a ser más creativa, estratégica y ética. Estamos aprendiendo a pensar diferente en la era de las tecnologías emergentes.",
+                    href="https://blockvoz.xyz/el-cerebro-y-la-inteligencia-artificial/",
+                ),
+                class_name="flex justify-center",
+            ),
+            class_name="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto items-start",
         ),
         id="blog",
         on_mount=lambda: State.set_active_nav("Blog"),
@@ -184,7 +295,7 @@ def index() -> rx.Component:
         rx.el.main(
             hero_section(),
             about_me_section(),
-            courses_section(),
+            # courses_section(),
             speaking_section(),
             blog_section(),
         ),
